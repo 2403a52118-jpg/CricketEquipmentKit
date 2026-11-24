@@ -120,6 +120,7 @@
 
         <!-- Current Inventory Overview -->
         <h2>📊 Equipment Inventory Status</h2>
+        <div class="table-responsive">
         <table>
             <thead>
                 <tr>
@@ -156,9 +157,11 @@
                 {% endif %}
             </tbody>
         </table>
+        </div>
 
         <!-- Borrowing Records & Return Actions -->
         <h2>📋 Equipment Borrowing Log & Returns</h2>
+        <div class="table-responsive">
         <table>
             <thead>
                 <tr>
@@ -205,6 +208,7 @@
                 {% endif %}
             </tbody>
         </table>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

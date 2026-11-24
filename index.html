@@ -3,26 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=http://localhost:5000/">
     <title>Cricket Kit Management System</title>
-    <script>
-        window.location.replace("http://localhost:5000/");
-    </script>
+    <link rel="stylesheet" href="static/style.css">
 </head>
-<body style="font-family: Arial, sans-serif; background: #eef2f3; margin: 0; padding: 40px 20px; text-align: center;">
-    <div style="background: white; max-width: 600px; margin: 40px auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <h1 style="color: #14532d; margin-top: 0;">🏏 Cricket Kit & Equipment Management</h1>
-        <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
-            Opening the live web application on your local Flask server...
-        </p>
-        <p style="margin-top: 25px;">
-            <a href="http://localhost:5000/" style="background: #15803d; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
-                Open http://localhost:5000
-            </a>
-        </p>
-        <p style="color: #9ca3af; font-size: 13px; margin-top: 25px;">
-            If the page does not open automatically, please ensure <code>python app.py</code> is running in your terminal.
-        </p>
+<body>
+
+    <h1>🏏 Cricket Kit & Equipment Management</h1>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        <div id="messages-container" class="messages"></div>
+
+        <!-- Quick Stats Dashboard -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-num" id="stat-types">0</span>
+                <span class="stat-label">Kit Categories</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="stat-total">0</span>
+                <span class="stat-label">Total Items</span>
+            </div>
+            <div class="stat-card highlight-green">
+                <span class="stat-num" id="stat-available">0</span>
+                <span class="stat-label">Available In Stock</span>
+            </div>
+            <div class="stat-card highlight-orange">
+                <span class="stat-num" id="stat-borrowed">0</span>
+                <span class="stat-label">Currently Borrowed</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="stat-players">0</span>
+                <span class="stat-label">Players Registered</span>
+            </div>
+        </div>
+
+        <!-- Issue / Borrow Kit Section -->
+        <h2>⚡ Issue Equipment to Player</h2>
+        <form id="borrow-form" class="action-form">
+            <select id="borrow-player-id" name="player_id" required>
+                <option value="" disabled selected>-- Select Player --</option>
+            </select>
+
+            <select id="borrow-equipment-id" name="equipment_id" required>
+                <option value="" disabled selected>-- Select Equipment --</option>
+            </select>
+
+            <input id="borrow-quantity" type="number" name="quantity" min="1" value="1" placeholder="Quantity" required style="width: 100px;">
+
+            <button type="submit">Issue Kit</button>
+        </form>
+
+        <!-- Quick Management: Add Player & Add Equipment -->
+        <div class="grid-two">
+            <div class="sub-card">
+                <h2>➕ Register New Player</h2>
+                <form id="player-form">
+                    <input id="player-name" type="text" name="name" placeholder="Player Full Name" required>
+                    <input id="player-phone" type="tel" name="phone" placeholder="Phone Number (e.g. 9876543210)" pattern="[0-9]{10}" title="Please enter a 10-digit phone number" required>
+                    <br>
+                    <button type="submit">Add Player</button>
+                </form>
+            </div>
+
+            <div class="sub-card">
+                <h2>📦 Add New Equipment</h2>
+                <form id="equipment-form">
+                    <input id="equipment-name" type="text" name="name" placeholder="Equipment Name" required>
+                    <input id="equipment-quantity" type="number" name="quantity" min="1" value="1" placeholder="Quantity" required style="width: 100px;">
+                    <br>
+                    <button type="submit">Add Stock</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Current Inventory Overview -->
+        <h2>📊 Equipment Inventory Status</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Equipment Name</th>
+                        <th>Total Quantity</th>
+                        <th>Available</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="equipment-table-body">
+                    <tr>
+                        <td colspan="5">Loading inventory...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Borrowing Records & Return Actions -->
+        <h2>📋 Equipment Borrowing Log & Returns</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Player Name</th>
+                        <th>Equipment</th>
+                        <th>Qty</th>
+                        <th>Issue Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="borrowings-table-body">
+                    <tr>
+                        <td colspan="7">No items borrowed yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mode-footer">
+            <span>💾 Data is saved locally in your browser (GitHub Pages Static Mode).</span>
+            <button type="button" id="reset-demo-btn" class="btn-secondary">Reset Sample Data</button>
+        </div>
     </div>
+
+    <script src="static/gh_pages.js"></script>
 </body>
 </html>

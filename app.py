@@ -64,7 +64,7 @@ def get_db_connection():
                 dbname=PG_DBNAME
             )
     else:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=15.0)
         conn.row_factory = sqlite3.Row
         return conn
 
