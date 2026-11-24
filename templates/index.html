@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Kit Management System</title>
+    <!-- Auto-redirect to local Flask server if opened directly from file system -->
+    <script>
+        if (window.location.protocol === 'file:') {
+            window.location.replace('http://127.0.0.1:5000/');
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+
+    <!-- Warning banner only shown if opened as static file:// without Flask -->
+    <div id="file-protocol-warning" style="display: none; background: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 18px; margin: 20px auto; max-width: 850px; text-align: center; color: #991b1b; font-family: Arial, sans-serif;">
+        <h3 style="margin: 0 0 8px 0; color: #991b1b;">⚠️ Notice: Opened as Static Local File</h3>
+        <p style="margin: 6px 0;">You opened this template directly from disk (<code>file:///</code>). Because this is a dynamic Python/Flask web app connected to a database, you must view it through the running web server.</p>
+        <p style="margin: 12px 0;">
+            <a href="http://127.0.0.1:5000/" style="background: #15803d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                👉 Click here to open http://127.0.0.1:5000
+            </a>
+        </p>
+    </div>
+    <script>
+        if (window.location.protocol === 'file:') {
+            document.getElementById('file-protocol-warning').style.display = 'block';
+        }
+    </script>
+
+    <h1>🏏 Cricket Kit & Equipment Management</h1>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Quick Stats Dashboard -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-num">{{ stats.total_types }}</span>
+                <span class="stat-label">Kit Categories</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ stats.total_items }}</span>
+                <span class="stat-label">Total Items</span>
+            </div>
+            <div class="stat-card highlight-green">
+                <span class="stat-num">{{ stats.available_items }}</span>
+                <span class="stat-label">Available In Stock</span>
+            </div>
+            <div class="stat-card highlight-orange">
+                <span class="stat-num">{{ stats.borrowed_items }}</span>
+                <span class="stat-label">Currently Borrowed</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ stats.total_players }}</span>
+                <span class="stat-label">Players Registered</span>
+            </div>
+        </div>
+
+        <!-- Issue / Borrow Kit Section -->
+        <h2>⚡ Issue Equipment to Player</h2>
+        <form action="{{ url_for('borrow') }}" method="POST" class="action-form">
+            <select name="player_id" required>
+                <option value="" disabled selected>-- Select Player --</option>
+                {% for player in players %}
+                    <option value="{{ player.id }}">{{ player.name }} ({{ player.phone or 'No Phone' }})</option>
+                {% endfor %}
+            </select>
+
+            <select name="equipment_id" required>
+                <option value="" disabled selected>-- Select Equipment --</option>
+                {% for item in equipment %}
+                    <option value="{{ item.id }}" {% if item.available == 0 %}disabled{% endif %}>
+                        {{ item.name }} ({{ item.available }} available)
+                    </option>
+                {% endfor %}
+            </select>
+
+            <input type="number" name="quantity" min="1" value="1" placeholder="Quantity" required style="width: 100px;">
+
+            <button type="submit">Issue Kit</button>
+        </form>
+
+        <!-- Quick Management: Add Player & Add Equipment -->
+        <div class="grid-two">
+            <div class="sub-card">
+                <h2>➕ Register New Player</h2>
+                <form action="{{ url_for('add_player') }}" method="POST">
+                    <input type="text" name="name" placeholder="Player Full Name" required>
+                    <input type="tel" name="phone" placeholder="Phone Number (e.g. 9876543210)" pattern="[0-9]{10}" title="Please enter a 10-digit phone number" required>
+                    <br>
+                    <button type="submit">Add Player</button>
+                </form>
+            </div>
+
+            <div class="sub-card">
+                <h2>📦 Add New Equipment</h2>
+                <form action="{{ url_for('add_equipment') }}" method="POST">
+                    <input type="text" name="name" placeholder="Equipment Name" required>
+                    <input type="number" name="quantity" min="1" value="1" placeholder="Quantity" required style="width: 100px;">
+                    <br>
+                    <button type="submit">Add Stock</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Current Inventory Overview -->
+        <h2>📊 Equipment Inventory Status</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Equipment Name</th>
+                    <th>Total Quantity</th>
+                    <th>Available</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if equipment %}
+                    {% for item in equipment %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td><strong>{{ item.name }}</strong></td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.available }}</td>
+                            <td>
+                                {% if item.available == 0 %}
+                                    <span class="badge badge-danger">Out of Stock</span>
+                                {% elif item.available <= 3 %}
+                                    <span class="badge badge-warning">Low Stock ({{ item.available }})</span>
+                                {% else %}
+                                    <span class="badge badge-success">In Stock</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">No equipment records found in database.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <!-- Borrowing Records & Return Actions -->
+        <h2>📋 Equipment Borrowing Log & Returns</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Player Name</th>
+                    <th>Equipment</th>
+                    <th>Qty</th>
+                    <th>Issue Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if borrowings %}
+                    {% for b in borrowings %}
+                        <tr>
+                            <td>#{{ b.id }}</td>
+                            <td>{{ b.player_name }}</td>
+                            <td><strong>{{ b.equipment_name }}</strong></td>
+                            <td>{{ b.quantity }}</td>
+                            <td>{{ b.issue_date }}</td>
+                            <td>
+                                {% if b.status == 'Borrowed' %}
+                                    <span class="badge badge-warning">Borrowed</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Returned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if b.status == 'Borrowed' %}
+                                    <form action="{{ url_for('return_kit', borrow_id=b.id) }}" method="POST" style="margin: 0; display: inline;">
+                                        <button type="submit" class="btn-return">Return Kit</button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted">Completed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">No items borrowed yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="../static/script.js"></script>
+</body>
+</html>
