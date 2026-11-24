@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Cricket Kit (Development)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/app.py",
+      "console": "integratedTerminal",
+      "jinja": true
+    },
+    {
+      "name": "Run Cricket Kit (Production WSGI)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/wsgi.py",
+      "console": "integratedTerminal"
+    }
+  ]
+}
